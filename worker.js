@@ -1,13 +1,13 @@
 function prepare(ctx, cb) {
   console.log("SAUCE prepare")
   var tsh = ctx.shellWrap("npm install")
-  forkProc(self.workingDir, tsh.cmd, tsh.args, cb)
+  ctx.forkProc(ctx.workingDir, tsh.cmd, tsh.args, cb)
 }
 
 function test(ctx, cb) {
   console.log("SAUCE test")
   var tsh = ctx.shellWrap("npm test")
-  forkProc(self.workingDir, tsh.cmd, tsh.args, cb)
+  ctx.forkProc(ctx.workingDir, tsh.cmd, tsh.args, cb)
 }
 
 
@@ -22,5 +22,8 @@ module.exports = function(ctx, cb) {
     prepare:prepare,
     test:test
   })
+
+  console.log("strider-sauce loaded")
+  cb(null, null)
 
 }
