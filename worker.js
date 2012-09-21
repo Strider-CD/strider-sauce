@@ -104,7 +104,8 @@ function test(ctx, cb) {
     function serverUp() {
       // Server is up, start Sauce Connector and run the tests via `npm sauce` invocations
       var done = false
-      var connectorProc = startConnector(process.env.SAUCE_USERNAME, process.env.SAUCE_API_KEY, function(exitCode) {
+      var connectorProc = startConnector(process.env.SAUCE_USERNAME, process.env.SAUCE_ACCESS_KEY,
+        function(exitCode) {
         console.log("Connector exited with code: %d", exitCode)
         if (!done) {
           ctx.striderMessage("Error starting Sauce Connector - failing test")
@@ -115,20 +116,36 @@ function test(ctx, cb) {
 
         }
       })
-      ctx.striderMessage("Waiting 10 seconds for Sauce Connector to come up")
-      // Wait 10 seconds for Sauce Connector to come up
-      setTimeout(function() {
-        if (!done) {
-          done = true
-          ctx.striderMessage("Shutting down Sauce Connector")
-          connectorProc.kill("SIGINT")
-          ctx.striderMessage("Shutting down server")
-          serverProc.kill()
-          return cb(1)
+      // Wait until connector outputs "You may start your tests"
+      connectorProc.stdout.on('data',function(data) {
+        // XXX Add a timeout here
+        if (/Connected! You may start your tests./.exec(data) !== null) {
+          var saucesh = ctx.shellWrap("npm run-script sauce")
+          var sauceProc = ctx.forkProc({
+            args: saucesh.args,
+            cmd: saucesh.cmd,
+            cwd: ctx.workingDir,
+            env: {
+              SAUCE_USERNAME:process.env.SAUCE_USERNAME,
+              SAUCE_ACCESS_KEY:process.env.SAUCE_ACCESS_KEY
+            }
+          }, function(code) {
+            ctx.striderMessage("npm run-script sauce exited with code " + code)
+            if (!done) {
+              done = true
+              ctx.striderMessage("Shutting down Sauce Connector")
+              connectorProc.kill("SIGINT")
+              ctx.striderMessage("Shutting down server")
+              serverProc.kill()
+              // Give Sauce Connector 5 seconds to gracefully stop before sending SIGTERM
+              setTimeout(function() {
+                connectorProc.kill()
+                return cb(code)
+              }, 5000)
+            }
+          })
         }
-      }, 10000)
-
-
+      })
     }
   }
 }
