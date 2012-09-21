@@ -10,7 +10,6 @@ function prepare(ctx, cb) {
   ctx.forkProc(ctx.workingDir, tsh.cmd, tsh.args, function(exitCode) {
     if (exitCode === 0) {
       ctx.striderMessage("npm install success")
-
     }
     cb(exitCode)
   })
