@@ -103,14 +103,32 @@ function test(ctx, cb) {
 
     function serverUp() {
       // Server is up, start Sauce Connector and run the tests via `npm sauce` invocations
+      var done = false
+      var connectorProc = startConnector("username", "apiKey", function(exitCode) {
+        console.log("Connector exited with code: %d", exitCode)
+        if (!done) {
+          ctx.striderMessage("Error starting Sauce Connector - failing test")
+          ctx.striderMessage("Shutting down server")
+          serverProc.kill()
+          done = true
+          return cb(1)
 
-      startConnector("username", "apiKey")
+        }
+      })
+      ctx.striderMessage("Waiting 10 seconds for Sauce Connector to come up")
+      // Wait 10 seconds for Sauce Connector to come up
+      setTimeout(function() {
+        if (!done) {
+          done = true
+          ctx.striderMessage("Shutting down Sauce Connector")
+          connectorProc.kill("SIGINT")
+          ctx.striderMessage("Shutting down server")
+          serverProc.kill()
+          return cb(1)
+        }
+      }, 10000)
 
 
-      ctx.striderMessage("Shutting down server")
-      serverProc.kill()
-
-      return cb(1)
     }
   }
 }
