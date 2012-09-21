@@ -1,3 +1,4 @@
+var fs = require('fs')
 var path = require('path')
 var request = require('request')
 
@@ -20,6 +21,21 @@ function prepare(ctx, cb) {
   })
 }
 
+function getPackageJson(filename, cb) {
+
+  fs.readFile(filename, function(err, data) {
+    if (err) return cb(err, null)
+    try {
+      var json = JSON.parse(data)
+      cb(null, json)
+    } catch(e) {
+      cb(e, null)
+    }
+  })
+
+
+}
+
 //
 // `npm install` has succeeded at this point.
 // We run `npm test` and assuming that has passed,
@@ -36,14 +52,25 @@ function test(ctx, cb) {
     } else {
       ctx.striderMessage("npm test success - trying Sauce tests...")
 
-      npmTestPassed()
+      // Parse package.json so we can run the start script directly.
+      // This is important because `npm start` will fork a subprocess a la shell
+      // which means we cannot track the PID and shut it down later.
+
+      getPackageJson(path.join(ctx.workingDir, "package.json"), npmTestPassed)
     }
   })
-  function npmTestPassed() {
+  function npmTestPassed(err, packageJson) {
+    if (err || packageJson.scripts.start === undefined) {
+      striderMessage("could not read package.json to find start command - failing test")
+      return cb(1)
+    }
     // `npm test` succeeded, so we go through the Sauce tests.
-    //
+
+
+
+
     // Start the app, suggesting a port via PORT environment variable
-    var tsh = ctx.shellWrap("npm start")
+    var tsh = ctx.shellWrap(packageJson.scripts.start)
     var serverProc = ctx.forkProc({
       args:tsh.args,
       cmd:tsh.cmd,
@@ -51,7 +78,6 @@ function test(ctx, cb) {
       env:{PORT:PORT},
     }, function(exitCode) {
       // Could perhaps be backgrounding itself. This should be avoided.
-      console.log("serverProc exited with code: %d", exitCode)
       if (exitCode !== 0 && !startPhaseDone) {
         // If we haven't already called back with completion,
         // and `npm start` exits with non-zero exit code,
