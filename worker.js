@@ -104,7 +104,7 @@ function test(ctx, cb) {
     function serverUp() {
       // Server is up, start Sauce Connector and run the tests via `npm sauce` invocations
       var done = false
-      var connectorProc = startConnector("username", "apiKey", function(exitCode) {
+      var connectorProc = startConnector(process.env.SAUCE_USERNAME, process.env.SAUCE_API_KEY, function(exitCode) {
         console.log("Connector exited with code: %d", exitCode)
         if (!done) {
           ctx.striderMessage("Error starting Sauce Connector - failing test")
