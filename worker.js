@@ -110,7 +110,7 @@ function test(ctx, cb) {
         if (!done) {
           ctx.striderMessage("Error starting Sauce Connector - failing test")
           ctx.striderMessage("Shutting down server")
-          serverProc.kill()
+          serverProc.kill("SIGKILL")
           done = true
           return cb(1)
 
@@ -137,9 +137,10 @@ function test(ctx, cb) {
               connectorProc.kill("SIGINT")
               ctx.striderMessage("Shutting down server")
               serverProc.kill()
-              // Give Sauce Connector 5 seconds to gracefully stop before sending SIGTERM
+              // Give Sauce Connector & server 5 seconds to gracefully stop before sending SIGKILL
               setTimeout(function() {
-                connectorProc.kill()
+                connectorProc.kill("SIGKILL")
+                serverProc.kill("SIGKILL")
                 return cb(code)
               }, 5000)
             }
