@@ -1,8 +1,13 @@
+var path = require('path')
 var request = require('request')
 
 // # of tries for webserver to start up on specified port
 // We test once per second
 var RETRIES = 10
+
+// Port on which the application-under-test should bind to on localhost.
+// Sauce Connector will tunnel from this to Sauce Cloud for Selenium tests
+var PORT = 8031
 
 function prepare(ctx, cb) {
   console.log("SAUCE prepare")
@@ -43,7 +48,7 @@ function test(ctx, cb) {
       args:tsh.args,
       cmd:tsh.cmd,
       cwd:ctx.workingDir,
-      env:{PORT:8031},
+      env:{PORT:PORT},
     }, function(exitCode) {
       // Could perhaps be backgrounding itself. This should be avoided.
       console.log("serverProc exited with code: %d", exitCode)
@@ -59,24 +64,24 @@ function test(ctx, cb) {
     })
 
     var tries = 0
-    ctx.striderMessage("Waiting for webserver to come up on localhost:8031...")
+    ctx.striderMessage("Waiting for webserver to come up on localhost:" + PORT)
     var intervalId = setInterval(function() {
       // Check for http status 200 on http://localhost:PORT/
-      request("http://localhost:8031/", function(err, response) {
+      request("http://localhost:"+PORT+"/", function(err, response) {
         if (startPhaseDone) {
           clearInterval(intervalId)
           return
         }
         if (!err && response.statusCode == 200) {
-          ctx.striderMessage("Got HTTP 200 on localhost:8031 indicating server is up")
+          ctx.striderMessage("Got HTTP 200 on localhost:" + PORT + " indicating server is up")
           startPhaseDone = true
           clearInterval(intervalId)
           serverUp()
         } else {
           tries++
-          console.log("Error on localhost:8031: %s", err)
+          console.log("Error on localhost:%d: %s", PORT, err)
           if (tries >= RETRIES) {
-            ctx.striderMessage("HTTP 200 check on localhost:8031 failed after " + tries + " retries, server not up - failing test")
+            ctx.striderMessage("HTTP 200 check on localhost:" + PORT + " failed after " + tries + " retries, server not up - failing test")
             clearInterval(intervalId)
             startPhaseDone = true
             return cb(1)
@@ -87,8 +92,21 @@ function test(ctx, cb) {
 
     }, 1000)
 
+    // Start the Sauce Connector. Returns childProcess object.
+    function startConnector(username, apiKey, cb) {
+      var jarPath = path.join(__dirname, "thirdparty", "Sauce-Connect.jar")
+      var jsh = ctx.shellWrap("java -jar " + jarPath + " " + username + " " + apiKey)
+      
+      ctx.striderMessage("Starting Sauce Connector")
+      return ctx.forkProc(__dirname, jsh.cmd, jsh.args, cb)
+    }
+
     function serverUp() {
       // Server is up, start Sauce Connector and run the tests via `npm sauce` invocations
+
+      startConnector("username", "apiKey")
+
+
       ctx.striderMessage("Shutting down server")
       serverProc.kill()
 
