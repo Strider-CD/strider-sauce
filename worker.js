@@ -139,7 +139,7 @@ function test(ctx, cb) {
 
       // Wait until connector outputs "You may start your tests"
       // before executing Sauce tests
-      connectorProc.stdout.on('data',function(data) {
+      connectorProc.stdout.on('data', function(data) {
         if (/Connected! You may start your tests./.exec(data) !== null) {
           var saucesh = ctx.shellWrap("npm run-script sauce")
           //: TODO this should be a loop, executing `npm run-script sauce` for each
