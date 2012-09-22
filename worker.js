@@ -10,6 +10,7 @@ var RETRIES = 10
 // Sauce Connector will tunnel from this to Sauce Cloud for Selenium tests
 var PORT = 8031
 
+// Custom prepare function - runs `npm install`
 function prepare(ctx, cb) {
   console.log("SAUCE prepare")
   var tsh = ctx.shellWrap("npm install")
@@ -21,8 +22,8 @@ function prepare(ctx, cb) {
   })
 }
 
-function getPackageJson(filename, cb) {
-
+// Read & parse a JSON file
+function getJson(filename, cb) {
   fs.readFile(filename, function(err, data) {
     if (err) return cb(err, null)
     try {
@@ -32,11 +33,8 @@ function getPackageJson(filename, cb) {
       cb(e, null)
     }
   })
-
-
 }
 
-//
 // `npm install` has succeeded at this point.
 // We run `npm test` and assuming that has passed,
 // then we start the Sauce test process.
@@ -51,12 +49,10 @@ function test(ctx, cb) {
       return cb(exitCode)
     } else {
       ctx.striderMessage("npm test success - trying Sauce tests...")
-
       // Parse package.json so we can run the start script directly.
       // This is important because `npm start` will fork a subprocess a la shell
       // which means we cannot track the PID and shut it down later.
-
-      getPackageJson(path.join(ctx.workingDir, "package.json"), npmTestPassed)
+      getJson(path.join(ctx.workingDir, "package.json"), npmTestPassed)
     }
   })
   function npmTestPassed(err, packageJson) {
@@ -65,9 +61,6 @@ function test(ctx, cb) {
       return cb(1)
     }
     // `npm test` succeeded, so we go through the Sauce tests.
-
-
-
 
     // Start the app, suggesting a port via PORT environment variable
     var tsh = ctx.shellWrap(packageJson.scripts.start)
@@ -82,13 +75,17 @@ function test(ctx, cb) {
         // If we haven't already called back with completion,
         // and `npm start` exits with non-zero exit code,
         // call back with error and mark done.
-
         ctx.striderMessage("npm start failed - failing test")
         startPhaseDone = true
         return cb(exitCode)
       }
     })
 
+    // The project webserver should be available via HTTP once started.
+    // This section implements a check which will attempt to make a HTTP request for /
+    // expecting a 200 response code. It will try RETRIES times, waiting 1 second
+    // between checks. If it fails after RETRIES times, the server process will be killed
+    // and the test failed.
     var tries = 0
     ctx.striderMessage("Waiting for webserver to come up on localhost:" + PORT)
     var intervalId = setInterval(function() {
@@ -114,8 +111,6 @@ function test(ctx, cb) {
           }
         }
       })
-
-
     }, 1000)
 
     // Start the Sauce Connector. Returns childProcess object.
@@ -127,8 +122,8 @@ function test(ctx, cb) {
       return ctx.forkProc(__dirname, jsh.cmd, jsh.args, cb)
     }
 
+    // Server is up, start Sauce Connector and run the tests via `npm sauce` invocations
     function serverUp() {
-      // Server is up, start Sauce Connector and run the tests via `npm sauce` invocations
       var done = false
       var connectorProc = startConnector(process.env.SAUCE_USERNAME, process.env.SAUCE_ACCESS_KEY,
         function(exitCode) {
@@ -139,18 +134,21 @@ function test(ctx, cb) {
           serverProc.kill("SIGKILL")
           done = true
           return cb(1)
-
         }
       })
+
       // Wait until connector outputs "You may start your tests"
+      // before executing Sauce tests
       connectorProc.stdout.on('data',function(data) {
-        // XXX Add a timeout here
         if (/Connected! You may start your tests./.exec(data) !== null) {
           var saucesh = ctx.shellWrap("npm run-script sauce")
+          //: TODO this should be a loop, executing `npm run-script sauce` for each
+          // browser/OS combo specified for the project.
           var sauceProc = ctx.forkProc({
             args: saucesh.args,
             cmd: saucesh.cmd,
             cwd: ctx.workingDir,
+            // TODO: Read Sauce creds from Strider per-project storage.
             env: {
               SAUCE_USERNAME:process.env.SAUCE_USERNAME,
               SAUCE_ACCESS_KEY:process.env.SAUCE_ACCESS_KEY
@@ -190,7 +188,6 @@ module.exports = function(ctx, cb) {
     test:test
   })
 
-  console.log("strider-sauce loaded")
+  console.log("strider-sauce extension loaded")
   cb(null, null)
-
 }
