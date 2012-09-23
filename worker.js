@@ -10,18 +10,6 @@ var RETRIES = 10
 // Sauce Connector will tunnel from this to Sauce Cloud for Selenium tests
 var PORT = 8031
 
-// Custom prepare function - runs `npm install`
-function prepare(ctx, cb) {
-  console.log("SAUCE prepare")
-  var tsh = ctx.shellWrap("npm install")
-  ctx.forkProc(ctx.workingDir, tsh.cmd, tsh.args, function(exitCode) {
-    if (exitCode === 0) {
-      ctx.striderMessage("npm install success")
-    }
-    cb(exitCode)
-  })
-}
-
 // Read & parse a JSON file
 function getJson(filename, cb) {
   fs.readFile(filename, function(err, data) {
@@ -186,7 +174,7 @@ module.exports = function(ctx, cb) {
     language:"node.js",
     framework:null,
     hasSauce:true,
-    prepare:prepare,
+    prepare:"npm install",
     test:test
   })
 
