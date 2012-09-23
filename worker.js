@@ -4,11 +4,11 @@ var request = require('request')
 
 // # of tries for application-under-test webserver to start up on specified port
 // We test once per second
-var RETRIES = 10
+var HTTP_CHECK_RETRIES = 10
 
 // Port on which the application-under-test webserver should bind to on localhost.
 // Sauce Connector will tunnel from this to Sauce Cloud for Selenium tests
-var PORT = 8031
+var HTTP_PORT = 8031
 
 // Read & parse a JSON file
 function getJson(filename, cb) {
@@ -56,7 +56,7 @@ function test(ctx, cb) {
       args:tsh.args,
       cmd:tsh.cmd,
       cwd:ctx.workingDir,
-      env:{PORT:PORT},
+      env:{PORT:HTTP_PORT},
     }, function(exitCode) {
       // Could perhaps be backgrounding itself. This should be avoided.
       if (exitCode !== 0 && !startPhaseDone) {
@@ -71,28 +71,28 @@ function test(ctx, cb) {
 
     // The project webserver should be available via HTTP once started.
     // This section implements a check which will attempt to make a HTTP request for /
-    // expecting a 200 response code. It will try RETRIES times, waiting 1 second
-    // between checks. If it fails after RETRIES times, the server process will be killed
+    // expecting a 200 response code. It will try HTTP_CHECK_RETRIES times, waiting 1 second
+    // between checks. If it fails after HTTP_CHECK_RETRIES times, the server process will be killed
     // and the test failed.
     var tries = 0
-    ctx.striderMessage("Waiting for webserver to come up on localhost:" + PORT)
+    ctx.striderMessage("Waiting for webserver to come up on localhost:" + HTTP_PORT)
     var intervalId = setInterval(function() {
-      // Check for http status 200 on http://localhost:PORT/
-      request("http://localhost:"+PORT+"/", function(err, response) {
+      // Check for http status 200 on http://localhost:HTTP_PORT/
+      request("http://localhost:"+HTTP_PORT+"/", function(err, response) {
         if (startPhaseDone) {
           clearInterval(intervalId)
           return
         }
         if (!err && response.statusCode == 200) {
-          ctx.striderMessage("Got HTTP 200 on localhost:" + PORT + " indicating server is up")
+          ctx.striderMessage("Got HTTP 200 on localhost:" + HTTP_PORT + " indicating server is up")
           startPhaseDone = true
           clearInterval(intervalId)
           serverUp()
         } else {
           tries++
-          console.log("Error on localhost:%d: %s", PORT, err)
-          if (tries >= RETRIES) {
-            var msg = ("HTTP 200 check on localhost:" + PORT + " failed after " + tries
+          console.log("Error on localhost:%d: %s", HTTP_PORT, err)
+          if (tries >= HTTP_CHECK_RETRIES) {
+            var msg = ("HTTP 200 check on localhost:" + HTTP_PORT + " failed after " + tries
               + " retries, server not up - failing test")
             ctx.striderMessage(msg)
             clearInterval(intervalId)
