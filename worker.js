@@ -2,11 +2,11 @@ var fs = require('fs')
 var path = require('path')
 var request = require('request')
 
-// # of tries for webserver to start up on specified port
+// # of tries for application-under-test webserver to start up on specified port
 // We test once per second
 var RETRIES = 10
 
-// Port on which the application-under-test should bind to on localhost.
+// Port on which the application-under-test webserver should bind to on localhost.
 // Sauce Connector will tunnel from this to Sauce Cloud for Selenium tests
 var PORT = 8031
 
