@@ -56,7 +56,7 @@ function test(ctx, cb) {
     }
   })
   function npmTestPassed(err, packageJson) {
-    if (err || packageJson.scripts.start === undefined) {
+    if (err || packageJson.scripts === undefined || packageJson.scripts.start === undefined) {
       striderMessage("could not read package.json to find start command - failing test")
       return cb(1)
     }
@@ -104,7 +104,9 @@ function test(ctx, cb) {
           tries++
           console.log("Error on localhost:%d: %s", PORT, err)
           if (tries >= RETRIES) {
-            ctx.striderMessage("HTTP 200 check on localhost:" + PORT + " failed after " + tries + " retries, server not up - failing test")
+            var msg = ("HTTP 200 check on localhost:" + PORT + " failed after " + tries
+              + " retries, server not up - failing test")
+            ctx.striderMessage(msg)
             clearInterval(intervalId)
             startPhaseDone = true
             return cb(1)
