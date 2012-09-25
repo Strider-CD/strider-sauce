@@ -181,6 +181,19 @@ module.exports = function(ctx, cb) {
     test:test
   })
 
+  function saucePlugin(schema, opts) {
+    schema.add({
+      sauce_access_key: String,
+      sauce_username: String,
+      sauce_browsers: [],
+    })
+
+
+  }
+
+  // Extend RepoConfig model with 'Sauce' properties
+  ctx.models.RepoConfig.plugin(saucePlugin)
+
   console.log("strider-sauce extension loaded")
   cb(null, null)
 }
