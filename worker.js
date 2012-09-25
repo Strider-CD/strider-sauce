@@ -31,14 +31,13 @@ function getJson(filename, cb) {
 // then we start the Sauce test process.
 // If `npm test` fails, we don't bother with the overhead of running the Sauce tests.
 function test(ctx, cb) {
-  if (ctx.jobData.repo_config.sauce_access_key === undefined
-    || ctx.jobData.repo_config.sauce_username === undefined) {
+  var sauceAccessKey = ctx.jobData.repo_config.sauce_access_key
+  var sauceUsername = ctx.jobData.repo_config.sauce_username
+  if (sauceAccessKey === undefined || sauceUsername === undefined) {
     ctx.striderMessage(("Sauce tests detected but Sauce credentials have not been configured!\n"
       + "  Please visit project config page to enter them"))
     return cb(1)
   }
-  var sauceAccessKey = ctx.jobData.repo_config.sauce_access_key
-  var sauceUsername = ctx.jobData.repo_config.sauce_username
   var startPhaseDone = false
   var tsh = ctx.shellWrap(ctx.npmCmd + " test")
   // Run 
