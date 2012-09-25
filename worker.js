@@ -6,6 +6,9 @@ var request = require('request')
 // We test once per second
 var HTTP_CHECK_RETRIES = 10
 
+// Interval in between HTTP checks in ms
+var HTTP_CHECK_INTERVAL = 1000
+
 // Port on which the application-under-test webserver should bind to on localhost.
 // Sauce Connector will tunnel from this to Sauce Cloud for Selenium tests
 var HTTP_PORT = 8031
@@ -30,7 +33,7 @@ function getJson(filename, cb) {
 function test(ctx, cb) {
   console.log("SAUCE test")
   var startPhaseDone = false
-  var tsh = ctx.shellWrap("npm test")
+  var tsh = ctx.shellWrap(ctx.npmCmd + " test")
   // Run 
   ctx.forkProc(ctx.workingDir, tsh.cmd, tsh.args, function(exitCode) {
     if (exitCode !== 0) {
@@ -101,7 +104,7 @@ function test(ctx, cb) {
           }
         }
       })
-    }, 1000)
+    }, HTTP_CHECK_INTERVAL)
 
     // Start the Sauce Connector. Returns childProcess object.
     function startConnector(username, apiKey, cb) {
@@ -131,7 +134,7 @@ function test(ctx, cb) {
       // before executing Sauce tests
       connectorProc.stdout.on('data', function(data) {
         if (/Connected! You may start your tests./.exec(data) !== null) {
-          var saucesh = ctx.shellWrap("npm run-script sauce")
+          var saucesh = ctx.shellWrap(ctx.npmCmd + " run-script sauce")
           //: TODO this should be a loop, executing `npm run-script sauce` for each
           // browser/OS combo specified for the project.
           var sauceProc = ctx.forkProc({
@@ -174,7 +177,7 @@ module.exports = function(ctx, cb) {
     language:"node.js",
     framework:null,
     hasSauce:true,
-    prepare:"npm install",
+    prepare:ctx.npmCmd + " install",
     test:test
   })
 
