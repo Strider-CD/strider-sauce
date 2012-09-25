@@ -31,7 +31,14 @@ function getJson(filename, cb) {
 // then we start the Sauce test process.
 // If `npm test` fails, we don't bother with the overhead of running the Sauce tests.
 function test(ctx, cb) {
-  console.log("SAUCE test")
+  if (ctx.jobData.repo_config.sauce_access_key === undefined
+    || ctx.jobData.repo_config.sauce_username === undefined) {
+    ctx.striderMessage(("Sauce tests detected but Sauce credentials have not been configured!\n"
+      + "  Please visit project config page to enter them"))
+    return cb(1)
+  }
+  var sauceAccessKey = ctx.jobData.repo_config.sauce_access_key
+  var sauceUsername = ctx.jobData.repo_config.sauce_username
   var startPhaseDone = false
   var tsh = ctx.shellWrap(ctx.npmCmd + " test")
   // Run 
@@ -118,7 +125,7 @@ function test(ctx, cb) {
     // Server is up, start Sauce Connector and run the tests via `npm sauce` invocations
     function serverUp() {
       var done = false
-      var connectorProc = startConnector(process.env.SAUCE_USERNAME, process.env.SAUCE_ACCESS_KEY,
+      var connectorProc = startConnector(sauceUsername, sauceAccessKey,
         function(exitCode) {
         console.log("Connector exited with code: %d", exitCode)
         if (!done) {
@@ -141,10 +148,9 @@ function test(ctx, cb) {
             args: saucesh.args,
             cmd: saucesh.cmd,
             cwd: ctx.workingDir,
-            // TODO: Read Sauce creds from Strider per-project storage.
             env: {
-              SAUCE_USERNAME:process.env.SAUCE_USERNAME,
-              SAUCE_ACCESS_KEY:process.env.SAUCE_ACCESS_KEY
+              SAUCE_USERNAME:sauceUsername,
+              SAUCE_ACCESS_KEY:sauceAccessKey,
             }
           }, function(code) {
             ctx.striderMessage("npm run-script sauce exited with code " + code)
