@@ -24,27 +24,22 @@ module.exports = function(ctx, cb) {
       return res.end(JSON.stringify(r, null, '\t'))
     }
 
-    Step(
-      function() {
-          req.user.get_repo_config(url, this)
-      },
-      function(err, repo, access_level, owner_user_obj) {
-        if (err) {
-          return error("Error fetching Repo Config for url " + url + ": " + err)
-        }
-        repo = repo.toJSON()
-        var r = {
-          status: "ok",
-          errors: [],
-          results: {
-            sauce_username: repo.sauce_username,
-            sauce_access_key: repo.sauce_access_key,
-            sauce_browsers: repo.sauce_browsers,
-          }
-        }
-        return res.end(JSON.stringify(r, null, '\t'))
+    req.user.get_repo_config(url, function(err, repo, access_level, owner_user_obj) {
+      if (err) {
+        return error("Error fetching Repo Config for url " + url + ": " + err)
       }
-    )
+      repo = repo.toJSON()
+      var r = {
+        status: "ok",
+        errors: [],
+        results: {
+          sauce_username: repo.sauce_username,
+          sauce_access_key: repo.sauce_access_key,
+          sauce_browsers: repo.sauce_browsers,
+        }
+      }
+      return res.end(JSON.stringify(r, null, '\t'))
+    })
   }
 
   /*
