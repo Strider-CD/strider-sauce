@@ -2,19 +2,7 @@
 // Strider Webapp extension for Sauce Labs tests
 //
 
-
-
 module.exports = function(ctx, cb) {
-
-
-  function saucePlugin(schema, opts) {
-    schema.add({
-      sauce_access_key: String,
-      sauce_username: String,
-      sauce_browsers: [],
-    })
-  }
-
   /*
    * GET /api/sauce/
    *
@@ -77,6 +65,13 @@ module.exports = function(ctx, cb) {
   }
 
   // Extend RepoConfig model with 'Sauce' properties
+  function saucePlugin(schema, opts) {
+    schema.add({
+      sauce_access_key: String,
+      sauce_username: String,
+      sauce_browsers: [],
+    })
+  }
   ctx.models.RepoConfig.plugin(saucePlugin)
 
   // Add webserver routes
@@ -93,6 +88,4 @@ module.exports = function(ctx, cb) {
   console.log("strider-sauce webapp extension loaded")
 
   cb(null, null)
-
-
 }
