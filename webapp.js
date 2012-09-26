@@ -34,7 +34,7 @@ module.exports = function(ctx, cb) {
       }
       res.statusCode = 400
       return res.end(JSON.stringify(r, null, '\t'))
-    };
+    }
 
     Step(
       function() {
