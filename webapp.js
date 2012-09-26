@@ -55,7 +55,54 @@ module.exports = function(ctx, cb) {
    */
   function postIndex(req, res) {
     console.log("post index")
-    return res.end("ok")
+    var url = req.param("url")
+    var sauce_username = req.param("sauce_username")
+    var sauce_access_key = req.param("sauce_access_key")
+    var sauce_browsers = req.param("sauce_browsers")
+
+    function error(err_msg) {
+      console.error("Strider-Sauce: postIndex() - %s", err_msg)
+      var r = {
+        errors: [err_msg],
+        status: "error"
+      }
+      res.statusCode = 400
+      return res.end(JSON.stringify(r, null, '\t'))
+    }
+
+    req.user.get_repo_config(url, function(err, repo, access_level, owner_user_obj) {
+      if (err) {
+        return error("Error fetching Repo Config for url " + url + ": " + err)
+      }
+      if (sauce_username) {
+        repo.sauce_username = sauce_username
+      }
+      if (sauce_access_key) {
+        repo.sauce_access_key = sauce_access_key
+      }
+      if (sauce_browsers) {
+        try {
+          sauce_browsers = JSON.parse(sauce_browsers)
+        } catch(e) {
+          return error("Error decoding `sauce_browsers` parameter - must be JSON-encoded array")
+        }
+        repo.sauce_browsers = sauce_browsers
+      }
+      repo.save(function(err, repo) {
+        repo = repo.toJSON()
+        var r = {
+          status: "ok",
+          errors: [],
+          results: {
+            sauce_username: repo.sauce_username,
+            sauce_access_key: repo.sauce_access_key,
+            sauce_browsers: repo.sauce_browsers,
+          }
+        }
+        return res.end(JSON.stringify(r, null, '\t'))
+
+      })
+    })
 
   }
 
