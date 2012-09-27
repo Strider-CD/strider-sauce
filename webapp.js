@@ -108,7 +108,7 @@ module.exports = function(ctx, cb) {
             return error(errmsg)
           }
           return res.end(JSON.stringify(r, null, '\t'))
-        })
+      })
 
     })
 
