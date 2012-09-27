@@ -104,7 +104,7 @@ module.exports = function(ctx, cb) {
           }
         }, function(err) {
           if (err) {
-            var errmsg = "Error saving sauce config " + email + ": " + err;
+            var errmsg = "Error saving sauce config " + req.user.email + ": " + err;
             return error(errmsg)
           }
           return res.end(JSON.stringify(r, null, '\t'))
