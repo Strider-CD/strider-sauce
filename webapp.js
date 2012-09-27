@@ -74,6 +74,13 @@ module.exports = function(ctx, cb) {
       if (err) {
         return error("Error fetching Repo Config for url " + url + ": " + err)
       }
+      // must have access_level > 0 to be able to continue;
+      if (access_level < 1) {
+        console.debug(
+          "User %s tried to change sauce config but doesn't have admin privileges on %s (access level: %s)",
+          req.user.email, url, access_level);
+        return error("You must have access level greater than 0 in order to be able to configure sauce.");
+      }
       if (sauce_username) {
         repo.sauce_username = sauce_username
       }
@@ -88,20 +95,21 @@ module.exports = function(ctx, cb) {
         }
         repo.sauce_browsers = sauce_browsers
       }
-      repo.save(function(err, repo) {
-        repo = repo.toJSON()
-        var r = {
-          status: "ok",
-          errors: [],
-          results: {
-            sauce_username: repo.sauce_username,
-            sauce_access_key: repo.sauce_access_key,
-            sauce_browsers: repo.sauce_browsers,
+      ctx.models.User.update({"github_config.url":repo.url},
+        {
+          $set:{
+            "github_config.$.sauce_username":repo.sauce_username,
+            "github_config.$.sauce_access_key":repo.sauce_access_key,
+            "github_config.$.sauce_browsers":repo.sauce_browsers,
           }
-        }
-        return res.end(JSON.stringify(r, null, '\t'))
+        }, function(err) {
+          if (err) {
+            var errmsg = "Error saving sauce config " + email + ": " + err;
+            return error(errmsg)
+          }
+          return res.end(JSON.stringify(r, null, '\t'))
+        })
 
-      })
     })
 
   }
