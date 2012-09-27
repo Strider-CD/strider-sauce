@@ -90,11 +90,10 @@ module.exports = function(ctx, cb) {
       if (sauce_browsers) {
         try {
           sauce_browsers = JSON.parse(sauce_browsers)
-          repo.sauce_browsers = q['$set']['github_config.$.sauce_browsers'] = sauce_browsers
         } catch(e) {
           return error("Error decoding `sauce_browsers` parameter - must be JSON-encoded array")
         }
-        repo.sauce_browsers = sauce_browsers
+        repo.sauce_browsers = q['$set']['github_config.$.sauce_browsers'] = sauce_browsers
       }
       var r = {
         status: "ok",
