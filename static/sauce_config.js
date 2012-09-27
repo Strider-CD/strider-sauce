@@ -4,6 +4,14 @@ define(
     var SauceConfigWidget = function(elem, params) {
       var params = apres.controller().params;
 
+      function message(message, classes) {
+        elem.find("div.alert").removeClass().addClass("alert " + classes).html(message).show();
+      }
+
+      function message_hide() {
+        elem.find("div.alert").hide();
+      }
+
       function load(url) {
         elem.find('.details').addClass('hide');
         elem.find('.alert').removeClass().addClass("alert alert-info").html("Loading ...");
@@ -16,7 +24,7 @@ define(
             elem.find('.sauce-username').val(data.results.sauce_username);
             elem.find('.sauce-access-key').val(data.results.sauce_access_key);
             elem.find('.details').show();
-            elem.find('.alert').removeClass().hide();
+            message_hide();
           },
           error: function(xhr, ts, e) {
             if (xhr && xhr.responseText) {
@@ -32,19 +40,16 @@ define(
       
       this.events = {
         "click #sauce-save": function() {
-          console.log("sauce click");
           var sauce_username = elem.find(".sauce-username").val();
           var sauce_access_key = elem.find(".sauce-access-key").val();
           $.ajax("/api/sauce", {
                 data: {url:params.repo_url, sauce_username:sauce_username, sauce_access_key:sauce_access_key},
                 error: function(xhr, ts, e) {
                   console.log(e);
-                  $(".alert")
-                    .removeClass().addClass("alert alert-error").html("Error saving sauce credentials.");
+                  message("Error saving sauce credentials.", "alert-error");
                 },
                 success: function(data, ts, xhr) {
-                  $(".alert")
-                    .removeClass().addClass("alert alert-success").html("Sauce credentials saved.");
+                  message("Sauce credentials saved.", "alert-success");
                 },
                 type: "POST",
           });
