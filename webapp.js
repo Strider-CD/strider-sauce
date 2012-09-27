@@ -54,7 +54,6 @@ module.exports = function(ctx, cb) {
    *
    */
   function postIndex(req, res) {
-    console.log("post index")
     var url = req.param("url")
     var sauce_username = req.param("sauce_username")
     var sauce_access_key = req.param("sauce_access_key")
@@ -81,35 +80,42 @@ module.exports = function(ctx, cb) {
           req.user.email, url, access_level);
         return error("You must have access level greater than 0 in order to be able to configure sauce.");
       }
+      var q = {$set:{}}
       if (sauce_username) {
-        repo.sauce_username = sauce_username
+        repo.sauce_username = q['$set']['github_config.$.sauce_username'] = sauce_username
       }
       if (sauce_access_key) {
-        repo.sauce_access_key = sauce_access_key
+        repo.sauce_access_key = q['$set']['github_config.$.sauce_access_key'] = sauce_access_key
       }
       if (sauce_browsers) {
         try {
           sauce_browsers = JSON.parse(sauce_browsers)
+          repo.sauce_browsers = q['$set']['github_config.$.sauce_browsers'] = sauce_browsers
         } catch(e) {
           return error("Error decoding `sauce_browsers` parameter - must be JSON-encoded array")
         }
         repo.sauce_browsers = sauce_browsers
       }
-      ctx.models.User.update({"github_config.url":repo.url},
-        {
-          $set:{
-            "github_config.$.sauce_username":repo.sauce_username,
-            "github_config.$.sauce_access_key":repo.sauce_access_key,
-            "github_config.$.sauce_browsers":repo.sauce_browsers,
-          }
-        }, function(err) {
-          if (err) {
-            var errmsg = "Error saving sauce config " + req.user.email + ": " + err;
-            return error(errmsg)
-          }
-          return res.end(JSON.stringify(r, null, '\t'))
-      })
-
+      var r = {
+        status: "ok",
+        errors: [],
+        results: {
+          sauce_username: repo.sauce_username,
+          sauce_access_key: repo.sauce_access_key,
+          sauce_browsers: repo.sauce_browsers,
+        }
+      }
+      if (sauce_username || sauce_access_key || sauce_browsers) {
+        ctx.models.User.update({"github_config.url":repo.url}, q, function(err) {
+            if (err) {
+              var errmsg = "Error saving sauce config " + req.user.email + ": " + err;
+              return error(errmsg)
+            }
+            return res.end(JSON.stringify(r, null, '\t'))
+        })
+      } else {
+        return res.end(JSON.stringify(r, null, '\t'))
+      }
     })
 
   }
