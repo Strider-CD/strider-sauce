@@ -1,3 +1,8 @@
+//
+// Strider Worker extension for Sauce Labs tests
+//
+
+
 var fs = require('fs')
 var path = require('path')
 var request = require('request')
@@ -199,6 +204,6 @@ module.exports = function(ctx, cb) {
   // Extend RepoConfig model with 'Sauce' properties
   ctx.models.RepoConfig.plugin(saucePlugin)
 
-  console.log("strider-sauce extension loaded")
+  console.log("strider-sauce worker extension loaded")
   cb(null, null)
 }
