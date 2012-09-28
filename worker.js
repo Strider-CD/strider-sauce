@@ -38,6 +38,17 @@ function getJson(filename, cb) {
 function test(ctx, cb) {
   var sauceAccessKey = ctx.jobData.repo_config.sauce_access_key
   var sauceUsername = ctx.jobData.repo_config.sauce_username
+  var sauceBrowsers = ctx.jobData.repo_config.sauce_browsers
+  if (sauceBrowsers === undefined || sauceBrowsers.length === 0) {
+    // Default to latest chrome on Windows Vista
+    sauceBrowsers = [
+      {
+        browserName:"chrome",
+        version:"",
+        os:"Windows 2008'
+      }
+    ]
+  }
   if (sauceAccessKey === undefined || sauceUsername === undefined) {
     ctx.striderMessage(("Sauce tests detected but Sauce credentials have not been configured!\n"
       + "  Please visit project config page to enter them"))
@@ -148,29 +159,44 @@ function test(ctx, cb) {
           var saucesh = ctx.shellWrap(ctx.npmCmd + " run-script sauce")
           //: TODO this should be a loop, executing `npm run-script sauce` for each
           // browser/OS combo specified for the project.
-          var sauceProc = ctx.forkProc({
-            args: saucesh.args,
-            cmd: saucesh.cmd,
-            cwd: ctx.workingDir,
-            env: {
-              SAUCE_USERNAME:sauceUsername,
-              SAUCE_ACCESS_KEY:sauceAccessKey,
-            }
-          }, function(code) {
-            ctx.striderMessage("npm run-script sauce exited with code " + code)
-            if (!done) {
-              done = true
-              ctx.striderMessage("Shutting down Sauce Connector")
-              connectorProc.kill("SIGINT")
-              ctx.striderMessage("Shutting down server")
-              serverProc.kill()
-              // Give Sauce Connector & server 5 seconds to gracefully stop before sending SIGKILL
-              setTimeout(function() {
-                connectorProc.kill("SIGKILL")
-                serverProc.kill("SIGKILL")
-                return cb(code)
-              }, 5000)
-            }
+          var sauceDoneCount = 0
+          var finaleStatusCode = 0
+          sauceBrowsers.forEach(function(o) {
+            ctx.striderMessage("Starting: SAUCE_BROWSER="+o.browserName
+              +" SAUCE_OS="+o.platform+" SAUCE_BROWSER_VERSION="+o.version+" npm run-script sauce")
+            var sauceProc = ctx.forkProc({
+              args: saucesh.args,
+              cmd: saucesh.cmd,
+              cwd: ctx.workingDir,
+              env: {
+                SAUCE_USERNAME:sauceUsername,
+                SAUCE_ACCESS_KEY:sauceAccessKey,
+                SAUCE_OS:o.platform,
+                SAUCE_BROWSER_VERSION:o.version,
+                SAUCE_BROWSER:o.browserName,
+              }
+            }, function(code) {
+              ctx.striderMessage("Exit code "+code
+                +" for: SAUCE_BROWSER="+o.browserName +" SAUCE_OS="+o.platform+" SAUCE_BROWSER_VERSION="+o.version+" npm run-script sauce")
+              sauceDoneCount++
+              // If a single test fails, the whole test job fails.
+              if (finaleStatusCode === 0 && code !== 0) {
+                finaleStatusCode = 1
+              }
+              if (!done && sauceDoneCount === sauceBrowsers.length) {
+                done = true
+                ctx.striderMessage("Shutting down Sauce Connector")
+                connectorProc.kill("SIGINT")
+                ctx.striderMessage("Shutting down server")
+                serverProc.kill()
+                // Give Sauce Connector & server 5 seconds to gracefully stop before sending SIGKILL
+                setTimeout(function() {
+                  connectorProc.kill("SIGKILL")
+                  serverProc.kill("SIGKILL")
+                  return cb(finaleStatusCode)
+                }, 5000)
+              }
+            })
           })
         }
       })
