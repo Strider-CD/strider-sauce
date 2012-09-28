@@ -88,9 +88,16 @@ module.exports = function(ctx, cb) {
         repo.sauce_access_key = q['$set']['github_config.$.sauce_access_key'] = sauce_access_key
       }
       if (sauce_browsers) {
+        var invalid = false
         try {
           sauce_browsers = JSON.parse(sauce_browsers)
+          if (!Array.isArray(sauce_browsers)) {
+            invalid = true
+          }
         } catch(e) {
+          invalid = true
+        }
+        if (invalid) {
           return error("Error decoding `sauce_browsers` parameter - must be JSON-encoded array")
         }
         repo.sauce_browsers = q['$set']['github_config.$.sauce_browsers'] = sauce_browsers
