@@ -143,11 +143,11 @@ function test(ctx, cb) {
       var connectorProc = startConnector(sauceUsername, sauceAccessKey,
         function(exitCode) {
         console.log("Connector exited with code: %d", exitCode)
+        serverProc.kill("SIGKILL")
         if (!done) {
           console.log("Killing connector")
           ctx.striderMessage("Error starting Sauce Connector - failing test")
           ctx.striderMessage("Shutting down server")
-          serverProc.kill("SIGKILL")
           done = true
           return cb(1)
         }
