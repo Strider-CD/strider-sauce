@@ -45,7 +45,7 @@ function test(ctx, cb) {
       {
         browserName:"chrome",
         version:"",
-        os:"Windows 2008"
+        platform:"Windows 2008"
       }
     ]
   }
