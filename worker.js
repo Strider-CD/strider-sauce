@@ -172,7 +172,7 @@ function test(ctx, cb) {
                 SAUCE_USERNAME:sauceUsername,
                 SAUCE_ACCESS_KEY:sauceAccessKey,
                 SAUCE_OS:o.platform,
-                SAUCE_BROWSER_VERSION:o.version,
+                SAUCE_BROWSER_VERSION:o.version || '',
                 SAUCE_BROWSER:o.browserName,
               }
             }, function(code) {
