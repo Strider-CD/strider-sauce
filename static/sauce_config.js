@@ -47,7 +47,7 @@ define(
           var parts = str.split('-');
           var platform = parts[0];
           var browser = parts[1];
-          var browserVerson = parts[2];
+          var browserVerson = parts[2] || '';
           sauceBrowsers.push({
             platform: platform,
             browserName: browser,
