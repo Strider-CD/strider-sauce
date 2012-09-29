@@ -190,6 +190,7 @@ function test(ctx, cb) {
                 serverProc.kill()
                 // Give Sauce Connector & server 5 seconds to gracefully stop before sending SIGKILL
                 setTimeout(function() {
+                  console.log("Timeout Kill")
                   connectorProc.kill("SIGKILL")
                   serverProc.kill("SIGKILL")
                   return cb(finaleStatusCode)
