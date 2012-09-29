@@ -144,6 +144,7 @@ function test(ctx, cb) {
         function(exitCode) {
         console.log("Connector exited with code: %d", exitCode)
         if (!done) {
+          console.log("Killing connector")
           ctx.striderMessage("Error starting Sauce Connector - failing test")
           ctx.striderMessage("Shutting down server")
           serverProc.kill("SIGKILL")
