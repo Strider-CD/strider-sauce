@@ -76,7 +76,7 @@ function test(ctx, cb) {
     // `npm test` succeeded, so we go through the Sauce tests.
 
     // Start the app, suggesting a port via PORT environment variable
-    var tsh = ctx.shellWrap(packageJson.scripts.start)
+    var tsh = ctx.shellWrap("exec " + packageJson.scripts.start)
     var serverProc = ctx.forkProc({
       args:tsh.args,
       cmd:tsh.cmd,
@@ -131,7 +131,7 @@ function test(ctx, cb) {
     // Start the Sauce Connector. Returns childProcess object.
     function startConnector(username, apiKey, cb) {
       var jarPath = path.join(__dirname, "thirdparty", "Sauce-Connect.jar")
-      var jsh = ctx.shellWrap("java -jar " + jarPath + " " + username + " " + apiKey)
+      var jsh = ctx.shellWrap("exec java -jar " + jarPath + " " + username + " " + apiKey)
       
       ctx.striderMessage("Starting Sauce Connector")
       return ctx.forkProc(__dirname, jsh.cmd, jsh.args, cb)
@@ -190,7 +190,6 @@ function test(ctx, cb) {
                 serverProc.kill()
                 // Give Sauce Connector & server 5 seconds to gracefully stop before sending SIGKILL
                 setTimeout(function() {
-                  console.log("Timeout Kill")
                   connectorProc.kill("SIGKILL")
                   serverProc.kill("SIGKILL")
                   return cb(finaleStatusCode)
