@@ -157,8 +157,6 @@ function test(ctx, cb) {
       connectorProc.stdout.on('data', function(data) {
         if (/Connected! You may start your tests./.exec(data) !== null) {
           var saucesh = ctx.shellWrap(ctx.npmCmd + " run-script sauce")
-          //: TODO this should be a loop, executing `npm run-script sauce` for each
-          // browser/OS combo specified for the project.
           var sauceDoneCount = 0
           var finaleStatusCode = 0
           sauceBrowsers.forEach(function(o) {
