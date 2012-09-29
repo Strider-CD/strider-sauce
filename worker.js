@@ -131,7 +131,7 @@ function test(ctx, cb) {
     // Start the Sauce Connector. Returns childProcess object.
     function startConnector(username, apiKey, cb) {
       var jarPath = path.join(__dirname, "thirdparty", "Sauce-Connect.jar")
-      var jsh = ctx.shellWrap("exec java -Xmx:64M -jar " + jarPath + " " + username + " " + apiKey)
+      var jsh = ctx.shellWrap("exec java -Xmx64M -jar " + jarPath + " " + username + " " + apiKey)
       
       ctx.striderMessage("Starting Sauce Connector")
       return ctx.forkProc(__dirname, jsh.cmd, jsh.args, cb)
