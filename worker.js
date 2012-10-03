@@ -131,7 +131,7 @@ function test(ctx, cb) {
     // Start the Sauce Connector. Returns childProcess object.
     function startConnector(username, apiKey, cb) {
       var jarPath = path.join(__dirname, "thirdparty", "Sauce-Connect.jar")
-      var jsh = ctx.shellWrap("exec java -Xmx64M -jar " + jarPath + " " + username + " " + apiKey)
+      var jsh = ctx.shellWrap("exec java -jar " + jarPath + " " + username + " " + apiKey)
       
       ctx.striderMessage("Starting Sauce Connector")
       return ctx.forkProc(__dirname, jsh.cmd, jsh.args, cb)
@@ -215,19 +215,6 @@ module.exports = function(ctx, cb) {
     prepare:ctx.npmCmd + " install",
     test:test
   })
-
-  function saucePlugin(schema, opts) {
-    schema.add({
-      sauce_access_key: String,
-      sauce_username: String,
-      sauce_browsers: [],
-    })
-
-
-  }
-
-  // Extend RepoConfig model with 'Sauce' properties
-  ctx.models.RepoConfig.plugin(saucePlugin)
 
   console.log("strider-sauce worker extension loaded")
   cb(null, null)
