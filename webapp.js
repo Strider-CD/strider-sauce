@@ -2,6 +2,8 @@
 // Strider Webapp extension for Sauce Labs tests
 //
 
+var path = require('path')
+
 module.exports = function(ctx, cb) {
   /*
    * GET /api/sauce/
@@ -145,6 +147,13 @@ module.exports = function(ctx, cb) {
     ctx.middleware.require_auth,
     ctx.middleware.require_params(["url"]),
     postIndex)
+
+  // Add panel HTML snippet for project config page
+  ctx.registerPanel('project_config', {
+    src: path.join(__dirname, "templates", "project_config.html"),
+    title: "Sauce Config",
+    id:"sauce_config",
+  })
 
 
   console.log("strider-sauce webapp extension loaded")
