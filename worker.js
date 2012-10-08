@@ -134,7 +134,7 @@ function test(ctx, cb) {
       var jsh = ctx.shellWrap("exec java -Xmx64m -jar " + jarPath + " " + username + " " + apiKey)
       
       ctx.striderMessage("Starting Sauce Connector")
-      return ctx.forkProc(__dirname, jsh.cmd, jsh.args, cb)
+      return ctx.forkProc(ctx.workingDir, jsh.cmd, jsh.args, cb)
     }
 
     // Server is up, start Sauce Connector and run the tests via `npm sauce` invocations
