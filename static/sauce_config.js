@@ -21,7 +21,8 @@ define(
           data: {url: url},
           dataType: "json",
           success: function (data, ts, xhr) {
-            setBrowsers(data.results.sauce_browsers);
+            var browsers = data.results.sauce_browsers || [];
+            setBrowsers(browsers);
             elem.find('.sauce-username').val(data.results.sauce_username);
             elem.find('.sauce-access-key').val(data.results.sauce_access_key);
             elem.find('.details').show();
