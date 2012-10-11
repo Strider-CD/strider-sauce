@@ -30,14 +30,13 @@ module.exports = function(ctx, cb) {
       if (err) {
         return error("Error fetching Repo Config for url " + url + ": " + err)
       }
-      repo = repo.toJSON()
       var r = {
         status: "ok",
         errors: [],
         results: {
-          sauce_username: repo.sauce_username,
-          sauce_access_key: repo.sauce_access_key,
-          sauce_browsers: repo.sauce_browsers,
+          sauce_username: repo.get('sauce_username'),
+          sauce_access_key: repo.get('sauce_access_key'),
+          sauce_browsers: repo.get('sauce_browsers'),
         }
       }
       return res.end(JSON.stringify(r, null, '\t'))
@@ -84,10 +83,10 @@ module.exports = function(ctx, cb) {
       }
       var q = {$set:{}}
       if (sauce_username) {
-        repo.sauce_username = q['$set']['github_config.$.sauce_username'] = sauce_username
+        repo.set('sauce_username', sauce_username)
       }
       if (sauce_access_key) {
-        repo.sauce_access_key = q['$set']['github_config.$.sauce_access_key'] = sauce_access_key
+        repo.set('sauce_access_key', sauce_access_key)
       }
       if (sauce_browsers) {
         var invalid = false
@@ -102,19 +101,19 @@ module.exports = function(ctx, cb) {
         if (invalid) {
           return error("Error decoding `sauce_browsers` parameter - must be JSON-encoded array")
         }
-        repo.sauce_browsers = q['$set']['github_config.$.sauce_browsers'] = sauce_browsers
+        repo.set('sauce_browsers', sauce_browsers)
       }
       var r = {
         status: "ok",
         errors: [],
         results: {
-          sauce_username: repo.sauce_username,
-          sauce_access_key: repo.sauce_access_key,
-          sauce_browsers: repo.sauce_browsers,
+          sauce_username: repo.get('sauce_username'),
+          sauce_access_key: repo.get('sauce_access_key'),
+          sauce_browsers: repo.get('sauce_browsers'),
         }
       }
       if (sauce_username || sauce_access_key || sauce_browsers) {
-        ctx.models.User.update({"github_config.url":repo.url}, q, function(err) {
+        req.user.save(function(err) {
             if (err) {
               var errmsg = "Error saving sauce config " + req.user.email + ": " + err;
               return error(errmsg)
