@@ -1,5 +1,6 @@
 {
   "author": "Niall O'Higgins <niallo@beyondfog.com> (http://beyondfog.com)",
+  "description": "Sauce Labs / Selenium support for Strider",
   "name": "strider-sauce",
   "version": "0.1.0",
   "homepage": "http://github.com/Strider-CD/strider-sauce",
