@@ -82,8 +82,14 @@ As soon as the Sauce Connector is ready, Strider will run your Selenium tests in
 command specified in your `package.json` `scripts.sauce` key in **one process for each browser/OS combination selected**. For example,
 if you configured your Sauce tests to run on Linux/Chrome and Windows Vista/IE9, Strider would spawn two processes - one for running your tests on Linux/Chrome and one for Windows Vista/IE9.
 
-Your tests 
+Each test process will have the browser, browser version and OS specified as
+environment variables: `SAUCE_BROWSER`, `SAUCE_BROWSER_VERSION` and `SAUCE_OS`
+respectively. It is your responsibility to ensure that these values are
+passed-through to your WebDriver connection to the Sauce Labs cloud. Some
+Selenium drivers, such as WD.js, are aware of these variables already.
 
-
+Strider will then wait for each process to complete. Only if every single test
+process exits with success will the build pass. In other words, if a single
+Selenium test process exits with a non-zero code, the build will fail.
 
 
