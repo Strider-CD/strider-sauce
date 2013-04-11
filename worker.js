@@ -55,19 +55,11 @@ function test(ctx, cb) {
     return cb(1)
   }
   var startPhaseDone = false
-  var tsh = ctx.shellWrap(ctx.npmCmd + " test")
-  // Run 
-  ctx.forkProc(ctx.workingDir, tsh.cmd, tsh.args, function(exitCode) {
-    if (exitCode !== 0) {
-      return cb(exitCode)
-    } else {
-      ctx.striderMessage("npm test success - trying Sauce tests...")
-      // Parse package.json so we can run the start script directly.
-      // This is important because `npm start` will fork a subprocess a la shell
-      // which means we cannot track the PID and shut it down later.
-      getJson(path.join(ctx.workingDir, "package.json"), npmTestPassed)
-    }
-  })
+  ctx.striderMessage("npm test success - trying Sauce tests...")
+  // Parse package.json so we can run the start script directly.
+  // This is important because `npm start` will fork a subprocess a la shell
+  // which means we cannot track the PID and shut it down later.
+  getJson(path.join(ctx.workingDir, "package.json"), npmTestPassed)
   function npmTestPassed(err, packageJson) {
     if (err || packageJson.scripts === undefined || packageJson.scripts.start === undefined) {
       striderMessage("could not read package.json to find start command - failing test")
@@ -212,7 +204,6 @@ module.exports = function(ctx, cb) {
     language:"node.js",
     framework:null,
     hasSauce:true,
-    prepare:ctx.npmCmd + " install",
     test:test
   })
 
