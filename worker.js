@@ -124,13 +124,63 @@ function test(ctx, cb) {
     // before executing Sauce tests
     connectorProc.stdout.on('data', function(data) {
       if (/Connected! You may start your tests./.exec(data) !== null) {
-        var sauceDoneCount = 0
-        var finaleStatusCode = 0
-        sauceBrowsers.forEach(function(o) {
-        
-        
-        })
-        return cb(0)
+          var resultsReceived = 0
+          var buildStatus = 0
+          var resultMessages = []
+          var finished = false
+          sauceBrowsers.forEach(function(browser) {
+            var worker = wd.remote("ondemand.saucelabs.com", 80, 
+              sauceUsername, sauceAccessKey)
+            var browserId = browser.browserName + "-" + browser.browserVersion + "-" + browser.platform.replace(" ", "-")
+            // ctx.browsertestPort and ctx.browsertestPath come from the `prepare` phase test
+            // plugin - e.g. strider-qunit.
+            var testUrl = "http://localhost:" +
+                ctx.browsertestPort + "/" + browserId + ctx.browsertestPath
+            worker.done = false
+            worker.init({
+              browserName: browser.browserName,
+              version: browser.browserVersion,
+              platform: browser.platform
+            }, function(err) {
+              if (err) {
+                log("Error creating Sauce worker: " + err)
+                return cb(1)
+              }
+              worker.get(testUrl, function() {
+                log("Created Sauce worker: " + browserId)
+              })
+
+            })
+
+            setTimeout(function() {
+              if (!worker.done) {
+                log("ERROR: Timeout of " + SAUCE_TEST_TIMEOUT + " ms exceeded for " + browserId + " - terminating ")
+                ctx.events.emit('testDone', { id: browserId, total:0, failed:1, passed:0, runtime: SAUCE_TEST_TIMEOUT })
+              }
+            }, SAUCE_TEST_TIMEOUT)
+            ctx.events.on('testDone', function(result) {
+              if (finished) return
+              if (result.id === browserId && worker && !worker.done) {
+                resultMessages.push("Results for tests on " + result.id + ": " + result.total + " total " +
+                  result.failed + " failed " + result.passed + " passed " + result.runtime + " ms runtime") 
+                if (result.failed !== 0) {
+                  buildStatus = 1
+                }
+                log("Terminating Sauce worker: " + browserId)
+                worker.quit()
+                worker.done = true
+                resultsReceived++
+              }
+              // If all the results are in, finish the build
+              if (resultsReceived == sauceBrowsers.length) {
+                finished = true
+                resultMessages.forEach(function(msg) {
+                  log(msg)
+                })
+                cb(buildStatus)
+              }
+            })
+          })
       }
     })
   }
