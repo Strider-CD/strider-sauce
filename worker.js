@@ -147,8 +147,10 @@ function test(ctx, cb) {
                 log("Error creating Sauce worker: " + err)
                 return cb(1)
               }
-              worker.get(testUrl, function() {
-                log("Created Sauce worker: " + browserId)
+              worker.setPageLoadTimeout(SAUCE_TEST_TIMEOUT, function() {
+                worker.get(testUrl, function() {
+                  log("Created Sauce worker: " + browserId)
+                })
               })
 
             })
