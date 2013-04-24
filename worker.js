@@ -117,7 +117,7 @@ function test(ctx, cb) {
     
     var done = false
     ctx.striderMessage("Starting Sauce Connector")
-    var connectorProc = ctx.forkProc(ctx.workingDir, jsh.cmd, jsh.args, exitCb)
+    connectorProc = ctx.forkProc(ctx.workingDir, jsh.cmd, jsh.args, exitCb)
     // Wait until connector outputs "You may start your tests"
     // before executing Sauce tests
     connectorProc.stdout.on('data', function(data) {
@@ -192,7 +192,7 @@ function test(ctx, cb) {
       console.log("Sauce Connector exited with code: %d", exitCode)
       // If the connector exited before the cleanup phase has run, it failed to start
       if (!cleanupRun) {
-        log("Error starting BrowserStack Connector - failing test")
+        log("Error starting Sauce Connector - failing test")
         cleanupRun = true
         fs.unlink(PIDFILE, function() {})
         return cb(1)
