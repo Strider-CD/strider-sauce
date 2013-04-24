@@ -131,7 +131,7 @@ function test(ctx, cb) {
           sauceBrowsers.forEach(function(browser) {
             var worker = wd.remote("ondemand.saucelabs.com", 80, 
               sauceUsername, sauceAccessKey)
-            var browserId = browser.browserName + "-" + browser.browserVersion + "-" + browser.platform.replace(" ", "-")
+            var browserId = browser.browserName + "-" + browser.version + "-" + browser.platform.replace(" ", "-")
             // ctx.browsertestPort and ctx.browsertestPath come from the `prepare` phase test
             // plugin - e.g. strider-qunit.
             var testUrl = "http://localhost:" +
@@ -139,8 +139,9 @@ function test(ctx, cb) {
             worker.done = false
             worker.init({
               browserName: browser.browserName,
-              version: browser.browserVersion,
-              platform: browser.platform
+              version: browser.version,
+              platform: browser.platform,
+              name: ctx.jobData.repo_config.display_url
             }, function(err) {
               if (err) {
                 log("Error creating Sauce worker: " + err)
