@@ -139,16 +139,15 @@ function test(ctx, cb) {
               browserName: browser.browserName,
               version: browser.version,
               platform: browser.platform,
-              name: ctx.jobData.repo_config.display_url
+              name: ctx.jobData.repo_config.display_url,
+              'idle-timeout': SAUCE_TEST_TIMEOUT / 1000
             }, function(err) {
               if (err) {
                 log("Error creating Sauce worker: " + err)
                 return cb(1)
               }
-              worker.setAsyncScriptTimeout(SAUCE_TEST_TIMEOUT, function() {
-                worker.get(testUrl, function() {
-                  log("Created Sauce worker: " + browserId)
-                })
+              worker.get(testUrl, function() {
+                log("Created Sauce worker: " + browserId)
               })
 
             })
