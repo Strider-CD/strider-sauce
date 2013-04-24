@@ -115,7 +115,6 @@ function test(ctx, cb) {
     var jarPath = path.join(__dirname, "thirdparty", "Sauce-Connect.jar")
     var jsh = ctx.shellWrap("exec java -Xmx64m -jar " + jarPath + " " + username + " " + apiKey)
     
-    var done = false
     ctx.striderMessage("Starting Sauce Connector")
     connectorProc = ctx.forkProc(ctx.workingDir, jsh.cmd, jsh.args, exitCb)
     // Wait until connector outputs "You may start your tests"
