@@ -51,7 +51,6 @@ function sauceConfigured(ctx) {
 
 // This will shut down the tunnel in a nice way
 function cleanup(ctx, cb) {
-  console.log("sauce")
   if (!sauceConfigured(ctx)) {
     return cb(0)
   }
@@ -75,7 +74,6 @@ function cleanup(ctx, cb) {
 
 function test(ctx, cb) {
 
-  console.log("sauce")
   if (!sauceConfigured(ctx)) {
     return cb()
   }
