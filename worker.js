@@ -41,8 +41,8 @@ function sauceConfigured(ctx) {
   var sauceAccessKey = ctx.jobData.repo_config.sauce_access_key
   var sauceUsername = ctx.jobData.repo_config.sauce_username
 
-  if (sauceAccessKey === undefined
-    || sauceUsername === undefined) {
+  if (!sauceAccessKey
+    || !sauceUsername) {
     return false
   }
 
