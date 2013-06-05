@@ -125,6 +125,7 @@ function test(ctx, cb) {
           var buildStatus = 0
           var resultMessages = []
           var finished = false
+          var tasks = []
           sauceBrowsers.forEach(function(browser) {
             var worker = wd.remote("ondemand.saucelabs.com", 80, 
               sauceUsername, sauceAccessKey)
@@ -160,6 +161,7 @@ function test(ctx, cb) {
             ctx.events.on('testDone', function(result) {
               if (finished) return
               if (result.id === browserId && worker && !worker.done) {
+                tasks.push({id:"sauce", data:{total:result.total, failed: result.failed, passed:result.passed, runtime:result.runtime, id:result.id}})
                 resultMessages.push("Results for tests on " + result.id + ": " + result.total + " total " +
                   result.failed + " failed " + result.passed + " passed " + result.runtime + " ms runtime") 
                 if (result.failed !== 0) {
@@ -176,7 +178,7 @@ function test(ctx, cb) {
                 resultMessages.forEach(function(msg) {
                   log(msg)
                 })
-                cb(buildStatus)
+                cb(buildStatus, tasks)
               }
             })
           })
