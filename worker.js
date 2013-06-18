@@ -100,7 +100,8 @@ function test(ctx, cb) {
 
   HTTP_PORT = ctx.browsertestPort || 8031
 
-  ctx.striderMessage("Waiting for webserver to come up on localhost:" + HTTP_PORT)
+
+  log("Waiting for webserver to come up on localhost:" + HTTP_PORT)
 
   check({url:"http://localhost:"+HTTP_PORT+"/", log:log}, function(err) {
     if (err) {
