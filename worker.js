@@ -127,6 +127,7 @@ function test(ctx, cb) {
           var resultMessages = []
           var finished = false
           var tasks = []
+          var sauceTimeoutSeconds = SAUCE_TEST_TIMEOUT / 1000
           sauceBrowsers.forEach(function(browser) {
             var worker = wd.remote("ondemand.saucelabs.com", 80, 
               sauceUsername, sauceAccessKey)
@@ -141,7 +142,8 @@ function test(ctx, cb) {
               version: browser.version,
               platform: browser.platform,
               name: ctx.jobData.repo_config.display_url,
-              'idle-timeout': SAUCE_TEST_TIMEOUT / 1000
+              'idle-timeout': sauceTimeoutSeconds,
+              'max-duration': sauceTimeoutSeconds
             }, function(err) {
               if (err) {
                 log("Error creating Sauce worker: " + err)
