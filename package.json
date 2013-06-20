@@ -2,7 +2,7 @@
   "author": "Niall O'Higgins <niallo@frozenridge.co> (http://frozenridge.co)",
   "description": "Sauce Labs / Selenium support for Strider",
   "name": "strider-sauce",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "homepage": "http://github.com/Strider-CD/strider-sauce",
   "repository": {
     "type": "git",
