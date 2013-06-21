@@ -105,7 +105,6 @@ function test(ctx, cb) {
 
   check({url:"http://localhost:"+HTTP_PORT+"/", log:log}, function(err) {
     if (err) {
-      clearInterval(intervalId)
       return cb(1)
     }
     serverUp()
