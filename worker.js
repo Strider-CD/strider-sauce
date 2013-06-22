@@ -130,7 +130,7 @@ function test(ctx, cb) {
           sauceBrowsers.forEach(function(browser) {
             var worker = wd.remote("ondemand.saucelabs.com", 80, 
               sauceUsername, sauceAccessKey)
-            var browserId = browser.browserName + "-" + browser.version + "-" + browser.platform.replace(" ", "-")
+            var browserId = browser.browserName.replace(' ', '_') + "-" + browser.version + "-" + browser.platform.replace(" ", "-")
             // ctx.browsertestPort and ctx.browsertestPath come from the `prepare` phase test
             // plugin - e.g. strider-qunit.
             var testUrl = "http://localhost:" +
