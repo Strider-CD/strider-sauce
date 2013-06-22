@@ -145,7 +145,8 @@ function test(ctx, cb) {
               'max-duration': sauceTimeoutSeconds
             }, function(err) {
               if (err) {
-                log("Error creating Sauce worker: " + err)
+                log("Error creating Sauce worker: ")
+                console.dir(err)
                 return cb(1)
               }
               worker.get(testUrl, function() {
