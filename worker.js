@@ -120,7 +120,9 @@ function test(ctx, cb) {
     // Wait until connector outputs "You may start your tests"
     // before executing Sauce tests
     connectorProc.stdout.on('data', function(data) {
+      console.log(">>", data);
       if (/Connected! You may start your tests./.exec(data) !== null) {
+          console.log(">> STRIDER-SAUCE :: TUNNEL READY")
           var resultsReceived = 0
           var buildStatus = 0
           var resultMessages = []
