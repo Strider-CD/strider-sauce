@@ -152,8 +152,11 @@ function test(ctx, cb) {
                 return cb(1)
               }
               log("Created Sauce worker: " + browserId)
-              worker.get(testUrl, function() {
-                log("worker -> " + testUrl)
+              worker.title(function(err, title){
+                log(browserId + " ... " + title + err)
+                worker.get(testUrl, function() {
+                  log("worker -> " + testUrl)
+                })
               })
 
             })
