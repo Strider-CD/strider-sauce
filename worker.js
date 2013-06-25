@@ -152,7 +152,7 @@ function test(ctx, cb) {
                 return cb(1)
               }
               log("Created Sauce worker: " + browserId)
-              worker.title(function(err, title){
+              worker.title(function(err, title){ // Potentially a selenium bug - wait on the title before doing the redirect
                 log(browserId + " ... " + title + err)
                 worker.get(testUrl, function() {
                   log("worker -> " + testUrl)
