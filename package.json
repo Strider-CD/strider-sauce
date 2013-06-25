@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "request": "~2.11.4",
-    "wd": "0.0.31",
+    "wd": "0.0.32",
     "httpcheck": "0.0.1"
   },
   "devDependencies": {},

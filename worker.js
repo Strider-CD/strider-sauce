@@ -151,8 +151,9 @@ function test(ctx, cb) {
                 console.dir(err)
                 return cb(1)
               }
+              log("Created Sauce worker: " + browserId)
               worker.get(testUrl, function() {
-                log("Created Sauce worker: " + browserId)
+                log("worker -> " + testUrl)
               })
 
             })
