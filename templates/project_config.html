@@ -23,14 +23,19 @@
   </div>
 
 <style>
-.saucebrowser{
-  float:left;
-  padding:5px;
-  border:1px solid #bbb;
-  margin:2px;
+.saucebrowser {
+  display: inline-block;
+  padding: 5px;
+  margin: 2px;
 }
-.saucebrowserc{
-  clear:both;
+.saucebrowser label {
+  min-height: 18px;
+}
+.saucebrowserc {
+  float: left;
+  margin: 2px 2px;
+  border: 1px solid #999;
+  padding: 10px;
 }
 </style>
 
@@ -58,8 +63,8 @@ $(function(){
     }
 
     b.append(
-      "<div class='saucebrowser'><label>" + browsers[i].short_version + "</label>" + 
-      "<input type='checkbox' value='" + browsers[i].os + "-" + browsers[i].api_name + "-" + browsers[i].short_version +"' /></div>"
+      "<div class='saucebrowser'><label>" + (browsers[i].short_version || 'latest') +
+          "<input type='checkbox' value='" + browsers[i].os + "-" + browsers[i].api_name + "-" + browsers[i].short_version +"' /></label></div>"
     )
   }
 })
