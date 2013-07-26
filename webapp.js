@@ -150,8 +150,11 @@ module.exports = function(ctx, cb) {
   // Add panel HTML snippet for project config page
   ctx.registerPanel('project_config', {
     src: path.join(__dirname, "templates", "project_config.html"),
+    plugin_name: 'strider-sauce',
+    controller: 'SauceCtrl',
     title: "Sauce Config",
     id:"sauce_config",
+    data: ['sauce_username', 'sauce_access_key', 'sauce_browsers']
   })
 
 
