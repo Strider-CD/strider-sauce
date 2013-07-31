@@ -24,13 +24,13 @@
     var parts = name.split('-');
     return {
       platform: parts[0],
-      browser: parts[1],
+      browserName: parts[1],
       version: parts[2] || ''
     };
   }
 
   function serializeName(browser) {
-    return browser.platform + '-' + browser.browser + '-' + browser.version;
+    return browser.platform + '-' + browser.browserName + '-' + browser.version;
   }
 
   function save(url, data, done) {
