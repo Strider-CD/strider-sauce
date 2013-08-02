@@ -82,12 +82,8 @@ module.exports = function(ctx, cb) {
         return error("You must have access level greater than 0 in order to be able to configure sauce.");
       }
       var q = {$set:{}}
-      if (sauce_username) {
-        repo.set('sauce_username', sauce_username)
-      }
-      if (sauce_access_key) {
-        repo.set('sauce_access_key', sauce_access_key)
-      }
+      repo.set('sauce_username', sauce_username)
+      repo.set('sauce_access_key', sauce_access_key)
       if (sauce_browsers) {
         var invalid = false
         try {
@@ -112,17 +108,13 @@ module.exports = function(ctx, cb) {
           sauce_browsers: repo.get('sauce_browsers'),
         }
       }
-      if (sauce_username || sauce_access_key || sauce_browsers) {
-        req.user.save(function(err) {
-            if (err) {
-              var errmsg = "Error saving sauce config " + req.user.email + ": " + err;
-              return error(errmsg)
-            }
-            return res.end(JSON.stringify(r, null, '\t'))
-        })
-      } else {
+      req.user.save(function(err) {
+        if (err) {
+          var errmsg = "Error saving sauce config " + req.user.email + ": " + err;
+          return error(errmsg)
+        }
         return res.end(JSON.stringify(r, null, '\t'))
-      }
+      })
     })
 
   }
@@ -150,8 +142,11 @@ module.exports = function(ctx, cb) {
   // Add panel HTML snippet for project config page
   ctx.registerPanel('project_config', {
     src: path.join(__dirname, "templates", "project_config.html"),
+    plugin_name: 'strider-sauce',
+    controller: 'SauceCtrl',
     title: "Sauce Config",
     id:"sauce_config",
+    data: ['sauce_username', 'sauce_access_key', 'sauce_browsers']
   })
 
 
