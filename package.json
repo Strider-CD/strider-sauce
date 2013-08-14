@@ -23,5 +23,17 @@
   ],
   "engines": {
     "node": "*"
+  },
+  "strider" : {
+    "title" : "Sauce",
+    "worker":"worker.js",
+    "webapp":"webapp.js",
+    "panel" : {
+      "src": "./templates/project_config.html",
+      "controller": "SauceCtrl",
+      "title": "Sauce Config",
+      "id": "strider-sauce",
+      "data": ["sauce_username", "sauce_access_key", "sauce_browsers"]
+    }
   }
 }
