@@ -55,7 +55,7 @@
   }
 
   app.controller('SauceCtrl', ['$scope', function ($scope) {
-    $scope.data = $scope.panelData.sauce_config;
+    $scope.data = $scope.panelData['strider-sauce'];
     $scope.completeName = completeName;
     $scope.operatingsystems = organize(browsers);
     $scope.browser_map = {};
