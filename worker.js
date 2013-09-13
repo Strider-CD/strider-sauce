@@ -212,7 +212,15 @@ function test(ctx, cb) {
 }
 
 
-module.exports = function(ctx, cb) {
+module.exports = {
+  init: function (config, job, context, done) {
+    done(null, {
+      test: test,
+      cleanup: cleanup
+    })
+  },
+}
+var x = function(ctx, cb) {
 
   ctx.addBuildHook({
     cleanup:cleanup,

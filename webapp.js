@@ -4,7 +4,10 @@
 
 var path = require('path')
 
-module.exports = function(ctx, cb) {
+module.exports = {
+  config: {}
+}
+var x = function(ctx, cb) {
   /*
    * GET /api/sauce/
    *

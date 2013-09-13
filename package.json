@@ -21,6 +21,13 @@
     "selenium",
     "tests"
   ],
+  "strider": {
+    "id": "sauce",
+    "type": "job",
+    "title": "Sauce",
+    "worker":"worker.js",
+    "webapp":"webapp.js"
+  },
   "engines": {
     "node": "*"
   }
