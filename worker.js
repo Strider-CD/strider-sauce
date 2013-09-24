@@ -116,7 +116,14 @@ function test(ctx, cb) {
     var jsh = ctx.shellWrap("exec java -Xmx64m -jar " + jarPath + " " + username + " " + apiKey)
     
     ctx.striderMessage("Starting Sauce Connector")
-    connectorProc = ctx.forkProc(ctx.workingDir, jsh.cmd, jsh.args, exitCb)
+    var opts = {
+      cwd: ctx.workingDir,
+      cmd: jsh.cmd,
+      args: jsh.args,
+      screencmd: true,
+      env: {}
+    }
+    connectorProc = ctx.forkProc(opts, exitCb)
     // Wait until connector outputs "You may start your tests"
     // before executing Sauce tests
     connectorProc.stdout.on('data', function(data) {
