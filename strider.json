@@ -1,0 +1,5 @@
+{
+"worker":"worker.js",
+"webapp":"webapp.js",
+"weight":"10"
+}
