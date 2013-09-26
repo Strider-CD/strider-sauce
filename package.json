@@ -26,7 +26,9 @@
     "type": "job",
     "title": "Sauce",
     "worker":"worker.js",
-    "webapp":"webapp.js"
+    "webapp":"webapp.js",
+    "config": true,
+    "icon": "icon.png"
   },
   "engines": {
     "node": "*"
