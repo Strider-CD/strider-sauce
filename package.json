@@ -34,14 +34,14 @@
     "node": "*"
   },
   "strider": {
+    "id": "sauce",
     "type": "job",
-    "webapp":"./webapp.js",
-    "panel" : {
-      "src": "./templates/project_config.html",
-      "controller": "SauceCtrl",
-      "title": "Sauce Config",
-      "id": "strider-sauce",
-      "data": ["sauce_browsers", "sauce_access_key", "sauce_password"]
+    "webapp":"webapp.js",
+    "worker":"worker.js",
+    "icon": "icon.png",
+    "title": "Sauce Labs",
+    "config": {
+      "controller": "SauceCtrl"
     }
   }
 }
