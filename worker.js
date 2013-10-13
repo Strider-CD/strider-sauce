@@ -51,9 +51,6 @@ function sauceConfigured(ctx) {
 
 // This will shut down the tunnel in a nice way
 function cleanup(ctx, cb) {
-  if (!sauceConfigured(ctx)) {
-    return cb(0)
-  }
   cleanupRun = true
   var msg = "Shutting down Sauce Connector"
   console.log(msg)
@@ -223,7 +220,7 @@ module.exports = {
   init: function (config, job, context, done) {
     done(null, {
       test: test,
-      cleanup: cleanup
+      //cleanup: cleanup
     })
   },
 }
