@@ -5,7 +5,12 @@
 var path = require('path')
 
 module.exports = {
-  config: {}
+  // Mongoose model
+  config: {
+    access_key: String,
+    username: String,
+    browsers: [],
+  }
 }
 var x = function(ctx, cb) {
   /*
