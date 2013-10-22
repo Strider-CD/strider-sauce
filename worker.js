@@ -37,9 +37,9 @@ function getJson(filename, cb) {
 }
 
 // Is Sauce configured for this context?
-function sauceConfigured(ctx) {
-  var sauceAccessKey = ctx.jobData.repo_config.sauce_access_key
-  var sauceUsername = ctx.jobData.repo_config.sauce_username
+function sauceConfigured(config) {
+  var sauceAccessKey = config.access_key
+  var sauceUsername = config.username
 
   if (!sauceAccessKey
     || !sauceUsername) {
@@ -54,7 +54,7 @@ function cleanup(ctx, cb) {
   cleanupRun = true
   var msg = "Shutting down Sauce Connector"
   console.log(msg)
-  ctx.striderMessage(msg)
+  ctx.out(msg)
   if (connectorProc) connectorProc.kill("SIGINT")
   // Give Sauce Connector 5 seconds to gracefully stop before sending SIGKILL
   setTimeout(function() {
@@ -62,22 +62,19 @@ function cleanup(ctx, cb) {
     fs.unlink(PIDFILE, function() {})
     msg = "Sauce Connector successfully shut down"
     console.log(msg)
-    ctx.striderMessage(msg)
+    ctx.out(msg)
 
     return cb(0)
   }, 5000)
 }
 
 
-function test(ctx, cb) {
+function test(config, ctx, cb) {
 
-  if (!sauceConfigured(ctx)) {
-    return cb()
-  }
-
-  var sauceAccessKey = ctx.jobData.repo_config.sauce_access_key
-  var sauceUsername = ctx.jobData.repo_config.sauce_username
-  var sauceBrowsers = ctx.jobData.repo_config.sauce_browsers
+  console.log("test")
+  var sauceAccessKey = config.access_key
+  var sauceUsername = config.username
+  var sauceBrowsers = config.browsers
 
   if (sauceBrowsers === undefined || sauceBrowsers.length === 0) {
     // Default to latest chrome on Windows Vista
@@ -91,7 +88,8 @@ function test(ctx, cb) {
   }
 
   function log(msg) {
-    ctx.striderMessage(msg)
+    console.log("log")
+    ctx.out(msg)
     console.log(msg)
   }
 
@@ -112,7 +110,7 @@ function test(ctx, cb) {
     var jarPath = path.join(__dirname, "thirdparty", "Sauce-Connect.jar")
     var jsh = ctx.shellWrap("exec java -Xmx64m -jar " + jarPath + " " + username + " " + apiKey)
     
-    ctx.striderMessage("Starting Sauce Connector")
+    ctx.out("Starting Sauce Connector")
     var opts = {
       cwd: ctx.workingDir,
       cmd: jsh.cmd,
@@ -218,19 +216,15 @@ function test(ctx, cb) {
 
 module.exports = {
   init: function (config, job, context, done) {
+    console.log("config", config)
     done(null, {
-      test: test,
-      //cleanup: cleanup
+      test: function(ctx, done) {
+        if (sauceConfigured(config)) {
+          console.log("sauce configured")
+        }
+        test(config, ctx, done)
+      },
+      cleanup: cleanup
     })
   },
-}
-var x = function(ctx, cb) {
-
-  ctx.addBuildHook({
-    cleanup:cleanup,
-    test:test
-  })
-
-  console.log("strider-sauce worker extension loaded")
-  cb(null, null)
 }
