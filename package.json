@@ -2,7 +2,7 @@
   "author": "Niall O'Higgins <niallo@frozenridge.co> (http://frozenridge.co)",
   "description": "Sauce Labs / Selenium support for Strider",
   "name": "strider-sauce",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "homepage": "http://github.com/Strider-CD/strider-sauce",
   "repository": {
     "type": "git",
@@ -24,24 +24,15 @@
   "strider": {
     "id": "sauce",
     "type": "job",
-    "title": "Sauce",
-    "worker":"worker.js",
-    "webapp":"webapp.js",
-    "config": true,
-    "icon": "icon.png"
-  },
-  "engines": {
-    "node": "*"
-  },
-  "strider": {
-    "id": "sauce",
-    "type": "job",
-    "webapp":"webapp.js",
-    "worker":"worker.js",
+    "webapp": "webapp.js",
+    "worker": "worker.js",
     "icon": "icon.png",
     "title": "Sauce Labs",
     "config": {
       "controller": "SauceCtrl"
     }
+  },
+  "engines": {
+    "node": "*"
   }
 }
