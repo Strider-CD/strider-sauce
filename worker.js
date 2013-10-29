@@ -141,7 +141,7 @@ module.exports = {
       env: {
              'BROWSERS': JSON.stringify(config.browsers)
            , 'SAUCE_USERNAME' : config.username
-           , 'SAUCE_ACCESSKEY' : config.access_key
+           , 'SAUCE_ACCESS_KEY' : config.access_key
            , 'WEBDRIVER_REMOTE' : JSON.stringify({hostname: "ondemand.saucelabs.com", port: 80, username: config.username, accessKey: config.accessKey})
            },
 
