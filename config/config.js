@@ -1,3 +1,4 @@
+/* global browsers: true, app: true */
 
 function organize(browsers) {
   var oss = {};

@@ -15,6 +15,9 @@
   },
   "devDependencies": {},
   "optionalDependencies": {},
+  "scripts": {
+    "test": "make test"
+  },
   "keywords": [
     "strider",
     "sauce",
