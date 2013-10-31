@@ -54,7 +54,7 @@ function cleanup(ctx, cb) {
   cleanupRun = true
   var msg = "Shutting down Sauce Connector"
   console.log(msg)
-  ctx.out(msg)
+  ctx.comment(msg)
   if (connectorProc) connectorProc.kill("SIGINT")
   // Give Sauce Connector 5 seconds to gracefully stop before sending SIGKILL
   setTimeout(function() {
@@ -62,7 +62,7 @@ function cleanup(ctx, cb) {
     fs.unlink(PIDFILE, function() {})
     msg = "Sauce Connector successfully shut down"
     console.log(msg)
-    ctx.out(msg)
+    ctx.comment(msg)
 
     return cb(0)
   }, 5000)
@@ -87,7 +87,7 @@ function prepare(config, ctx, cb) {
   }
 
   function log(msg) {
-    ctx.out(msg)
+    ctx.comment(msg)
     console.log(msg)
   }
 
@@ -99,7 +99,7 @@ function prepare(config, ctx, cb) {
     var jargs = ["-Xmx64m", "-jar", jarPath, username, apiKey]
     var screencmd = "java -Xmx64m -jar " + jarPath + " [USERNAME] [API KEY]"
     
-    ctx.out("Starting Sauce Connector")
+    ctx.comment("Starting Sauce Connector")
     var opts = {
       cwd: ctx.workingDir,
       cmd: {
