@@ -41,8 +41,7 @@ function sauceConfigured(config) {
   var sauceAccessKey = config.access_key
   var sauceUsername = config.username
 
-  if (!sauceAccessKey
-    || !sauceUsername) {
+  if (!sauceAccessKey || !sauceUsername) {
     return false
   }
 
