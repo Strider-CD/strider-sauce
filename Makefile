@@ -1,10 +1,10 @@
 
 test: lint
-	@mocha -R spec
+	@./node_modules/.bin/mocha -R spec
 
 tolint := *.js *.json config
 
 lint:
-	@jshint --verbose $(tolint)
+	@./node_modules/.bin/jshint --verbose $(tolint)
 
 .PHONY: test lint watch build less
