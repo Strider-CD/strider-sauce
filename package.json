@@ -13,7 +13,10 @@
     "wd": "0.0.32",
     "httpcheck": "0.0.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "jshint": "~2.3.0",
+    "mocha": "~1.14.0"
+  },
   "optionalDependencies": {},
   "scripts": {
     "test": "make test"
