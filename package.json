@@ -21,7 +21,7 @@
   "optionalDependencies": {},
   "scripts": {
     "test": "make test",
-    "preinstall": "node install.js"
+    "install": "node install.js"
   },
   "keywords": [
     "strider",
