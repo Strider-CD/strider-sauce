@@ -1,3 +1,6 @@
+// Download and unzip Sauce-Connect.jar to thirdparty directory.
+// means we no longer need to bundle the large binary with this.
+
 var fs = require('fs')
 var path = require('path')
 var request = require('request')
