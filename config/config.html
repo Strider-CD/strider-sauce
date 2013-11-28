@@ -26,6 +26,17 @@
           </div>
         </fieldset>
       </div>
+      <div class="well">
+	      <fieldset>
+	      	  <h2>Proxies</h2>
+		      <div ng-repeat="proxy in getProxies()" class="sauceproxy">
+			  	[[ proxy.name ]] - [[ proxy.value ]] <button ng-click="removeProxy($index)" class="btn btn-danger">Delete</button>
+			  </div>
+			  <label for="proxyName">Name</label><input id="proxyName" ng-model="proxyName" value="" />
+			  <label for="proxyValue">Value (IP address:Port)</label><input id="proxyValue" ng-model="proxyValue" value="" />
+		      <button ng-click="addProxy()">Add proxy</button>
+	      </fieldset>
+      </div>
       <button ng-click="save()" class="btn btn-primary">Save</button>
       <button ng-click="clear()" class="btn">Clear Browsers</button>
       <div class='sauce-browsers'>
@@ -73,5 +84,9 @@
   border: 1px solid #999;
   padding: 10px;
   text-align: center;
+}
+
+.sauceproxy{
+	font-size: 14pt;
 }
 </style>

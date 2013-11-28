@@ -19,7 +19,7 @@ var PIDFILE = path.join(__dirname, "tunnel.pid")
 // Permits self-healing in worst-case hang
 var SAUCE_TEST_TIMEOUT = 1000 * 60 * 45 // 45 minutes
 
-var connectorProc
+var connectorProcs = []
 
 var cleanupRun = false
 
@@ -41,7 +41,8 @@ function sauceConfigured(config) {
   var sauceAccessKey = config.access_key
   var sauceUsername = config.username
 
-  if (!sauceAccessKey || !sauceUsername) {
+  if (!sauceAccessKey
+    || !sauceUsername) {
     return false
   }
 
@@ -54,17 +55,19 @@ function cleanup(ctx, cb) {
   var msg = "Shutting down Sauce Connector"
   console.log(msg)
   ctx.comment(msg)
-  if (connectorProc) connectorProc.kill("SIGINT")
-  // Give Sauce Connector 5 seconds to gracefully stop before sending SIGKILL
-  setTimeout(function() {
-    if (connectorProc) connectorProc.kill("SIGKILL")
-    fs.unlink(PIDFILE, function() {})
-    msg = "Sauce Connector successfully shut down"
-    console.log(msg)
-    ctx.comment(msg)
+  connectorProcs.forEach(function(connectorProc){
+    connectorProc.kill("SIGINT")
+    // Give Sauce Connector 5 seconds to gracefully stop before sending SIGKILL
+    setTimeout(function() {
+      if (connectorProc) connectorProc.kill("SIGKILL")
+      fs.unlink(PIDFILE, function() {})
+      msg = "Sauce Connector successfully shut down"
+      console.log(msg)
+      ctx.comment(msg)
 
-    return cb(0)
-  }, 5000)
+      return cb(0)
+    }, 5000)
+  });
 }
 
 
@@ -92,11 +95,20 @@ function prepare(config, ctx, cb) {
 
 
   // Start the Sauce Connector. Returns childProcess object.
-  function startConnector(username, apiKey, exitCb) {
+  function startConnector(username, apiKey, proxy, num, exitCb) {
     var jarPath = path.join(__dirname, "thirdparty", "Sauce-Connect.jar")
     var jcmd = "java"
     var jargs = ["-Xmx64m", "-jar", jarPath, username, apiKey]
     var screencmd = "java -Xmx64m -jar " + jarPath + " [USERNAME] [API KEY]"
+    if(proxy){
+      jargs.push("-i", proxy.name);
+      jargs.push("-p", proxy.value);
+      jargs.push("-P", "445"+num);
+      screencmd += " -i " + proxy.name + " -p " + proxy.value + " -P 445" + num;
+    }
+    if(!num){
+      num = 0;
+    }
     
     ctx.comment("Starting Sauce Connector")
     var opts = {
@@ -107,29 +119,51 @@ function prepare(config, ctx, cb) {
         screen: screencmd
       }
     }
-    connectorProc = ctx.cmd(opts, exitCb)
-    // Wait until connector outputs "You may start your tests"
-    // before returning
-    connectorProc.stdout.on('data', function(data) {
-      console.log(">>", data);
-      if (/Connected! You may start your tests./.exec(data) !== null) {
-          console.log(">> STRIDER-SAUCE :: TUNNEL READY")
-          return cb(null, true)
+    connectorProcs[num] = ctx.cmd(opts, exitCb)
+
+    if (num == config.proxies.length - 1 || config.proxies.length == 0){
+      // Wait until connector outputs "You may start your tests"
+      // before returning
+      connectorProcs[num].stdout.on('data', function(data) {
+        console.log(">>", data);
+        if (/Connected! You may start your tests./.exec(data) !== null) {
+            console.log(">> STRIDER-SAUCE :: TUNNEL READY")
+            return cb(null, true)
+        }
+      })
+    }
+  }
+  console.log("Starting sauce connector")
+
+  if (config.proxies.length > 0){
+    for (var i=0; i<config.proxies.length; i++) {
+      startConnector(sauceUsername, sauceAccessKey, config.proxies[i], i,
+      function(exitCode) {
+      console.log("Sauce Connector exited with code: %d", exitCode)
+      // If the connector exited before the cleanup phase has run, it failed to start
+      if (!cleanupRun) {
+        log("Error starting Sauce Connector - failing test")
+        cleanupRun = true
+        fs.unlink(PIDFILE, function() {})
+        return cb(1)
+      }
+    })
+    }
+  } else {
+    startConnector(sauceUsername, sauceAccessKey, null, null,
+      function(exitCode) {
+      console.log("Sauce Connector exited with code: %d", exitCode)
+      // If the connector exited before the cleanup phase has run, it failed to start
+      if (!cleanupRun) {
+        log("Error starting Sauce Connector - failing test")
+        cleanupRun = true
+        fs.unlink(PIDFILE, function() {})
+        return cb(1)
       }
     })
   }
-  console.log("Starting sauce connector")
-  startConnector(sauceUsername, sauceAccessKey,
-    function(exitCode) {
-    console.log("Sauce Connector exited with code: %d", exitCode)
-    // If the connector exited before the cleanup phase has run, it failed to start
-    if (!cleanupRun) {
-      log("Error starting Sauce Connector - failing test")
-      cleanupRun = true
-      fs.unlink(PIDFILE, function() {})
-      return cb(1)
-    }
-  })
+
+
 }
 
 
@@ -141,6 +175,7 @@ module.exports = {
              'BROWSERS': JSON.stringify(config.browsers)
            , 'SAUCE_USERNAME' : config.username
            , 'SAUCE_ACCESS_KEY' : config.access_key
+           , 'PROXIES': JSON.stringify(config.proxies)
            , 'WEBDRIVER_REMOTE' : JSON.stringify({hostname: "ondemand.saucelabs.com", port: 80, username: config.username, accessKey: config.accessKey})
            },
 

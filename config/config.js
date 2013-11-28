@@ -1,4 +1,3 @@
-/* global browsers: true, app: true */
 
 function organize(browsers) {
   var oss = {};
@@ -43,11 +42,21 @@ app.controller('SauceCtrl', ['$scope', function ($scope) {
     for (var i=0; i<value.browsers.length; i++) {
       $scope.browser_map[serializeName(value.browsers[i])] = true;
     }
+    $scope.proxies = $scope.config && $scope.config.proxies ? $scope.config.proxies : [];
   });
   $scope.completeName = completeName;
   $scope.operatingsystems = organize(browsers || []);
+
   $scope.save = function () {
+    console.log($scope.proxies);
     $scope.config.browsers = [];
+    
+    $scope.config.proxies = [];
+    for (var rawproxy in $scope.proxies) {
+      var currentProxy = $scope.proxies[rawproxy];
+      $scope.config.proxies.push({name: currentProxy.name , value: currentProxy.value});
+    }
+
     for (var name in $scope.browser_map) {
       if ($scope.browser_map[name]) {
         $scope.config.browsers.push(parseName(name));
@@ -60,4 +69,21 @@ app.controller('SauceCtrl', ['$scope', function ($scope) {
     $scope.browser_map = {};
     $scope.$digest();
   };
+  $scope.addProxy = function () {
+    var currentProxy = {
+      name:$scope.proxyName,
+      value:$scope.proxyValue
+    };
+    $scope.proxies.push(currentProxy);
+    $scope.proxyName = "";
+    $scope.proxyValue = "";
+  };
+
+  $scope.removeProxy = function (index) {
+    $scope.proxies.splice(index, 1);
+  };
+
+  $scope.getProxies = function () {
+    return $scope.proxies;
+  }
 }]);
