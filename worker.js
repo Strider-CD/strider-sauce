@@ -93,7 +93,7 @@ function prepare(config, ctx, cb) {
 
   // Start the Sauce Connector. Returns childProcess object.
   function startConnector(username, apiKey, exitCb) {
-    var jarPath = path.join(__dirname, "thirdparty", "Sauce-Connect.jar")
+    var jarPath = process.env.SAUCE_JAR || path.join(__dirname, "thirdparty", "Sauce-Connect.jar")
     var jcmd = "java"
     var jargs = ["-Xmx64m", "-jar", jarPath, username, apiKey]
     var screencmd = "java -Xmx64m -jar " + jarPath + " [USERNAME] [API KEY]"
