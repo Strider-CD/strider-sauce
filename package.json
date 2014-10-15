@@ -1,6 +1,6 @@
 {
   "name": "strider-sauce",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "Sauce Labs / Selenium support for Strider",
   "homepage": "http://github.com/Strider-CD/strider-sauce",
   "author": "Niall O'Higgins <niallo@frozenridge.co> (http://frozenridge.co)",
