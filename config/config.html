@@ -12,22 +12,21 @@
             <div class="span8">
               <div class="control-group">
                 <div class="controls">
-                  <label>
-                    Username
-                    <input type="text" ng-model="config.username" placeholder="sauce username" class="sauce-username large"/>
-                  </label>
-                  <label>
-                    Access Key
-                    <input size="25" type="text" ng-model="config.access_key" placeholder="sauce access key" class="sauce-access-key xlarge"/>
-                  </label>
+                  <label for="strider-sauce-username">Username</label>
+                  <input id="strider-sauce-username" type="text" ng-model="config.username" placeholder="sauce username" class="sauce-username large"/>
+
+                  <label for="strider-sauce-key">Access Key</label>
+                  <input id="strider-sauce-key" size="25" type="text" ng-model="config.access_key" placeholder="sauce access key" class="sauce-access-key xlarge"/>
                 </div>
               </div>
             </div>
           </div>
         </fieldset>
       </div>
+
       <button ng-click="save()" class="btn btn-primary">Save</button>
-      <button ng-click="clear()" class="btn">Clear Browsers</button>
+      <button ng-click="clear()" class="btn btn-default pull-right">Clear Browsers</button>
+
       <div class='sauce-browsers'>
         <div ng-repeat="(os, browsers) in operatingsystems" class="os">
           <h2>[[ os ]]</h2>
@@ -57,21 +56,21 @@
     border: 1px solid #999;
     padding: 10px;
   }
-.saucebrowser {
-  display: inline-block;
-  padding: 5px;
-  margin: 2px;
-  text-align: center;
-}
-.saucebrowser label {
-  min-height: 18px;
-  text-align: center;
-}
-.saucebrowserc {
-  float: left;
-  margin: 2px 2px;
-  border: 1px solid #999;
-  padding: 10px;
-  text-align: center;
-}
+  .saucebrowser {
+    display: inline-block;
+    padding: 5px;
+    margin: 2px;
+    text-align: center;
+  }
+  .saucebrowser label {
+    min-height: 18px;
+    text-align: center;
+  }
+  .saucebrowserc {
+    float: left;
+    margin: 2px 2px;
+    border: 1px solid #999;
+    padding: 10px;
+    text-align: center;
+  }
 </style>

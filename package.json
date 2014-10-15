@@ -1,9 +1,9 @@
 {
-  "author": "Niall O'Higgins <niallo@frozenridge.co> (http://frozenridge.co)",
-  "description": "Sauce Labs / Selenium support for Strider",
   "name": "strider-sauce",
   "version": "0.6.2",
+  "description": "Sauce Labs / Selenium support for Strider",
   "homepage": "http://github.com/Strider-CD/strider-sauce",
+  "author": "Niall O'Higgins <niallo@frozenridge.co> (http://frozenridge.co)",
   "repository": {
     "type": "git",
     "url": "git://github.com/Strider-CD/strider-sauce.git"
@@ -18,7 +18,6 @@
     "jshint": "~2.3.0",
     "mocha": "~1.14.0"
   },
-  "optionalDependencies": {},
   "scripts": {
     "test": "make test",
     "install": "node install.js"
@@ -27,7 +26,8 @@
     "strider",
     "sauce",
     "selenium",
-    "tests"
+    "tests",
+    "saucelabs"
   ],
   "strider": {
     "id": "sauce",
