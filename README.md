@@ -1,4 +1,4 @@
-Strider-Sauce
+strider-sauce
 =============
 
 Strider-Sauce adds support for easily running [Selenium][selenium] tests in parallel on
