@@ -2,8 +2,6 @@
 // Strider Webapp extension for Sauce Labs tests
 //
 
-var path = require('path')
-
 module.exports = {
   // Mongoose model
   config: {
@@ -11,4 +9,4 @@ module.exports = {
     username: String,
     browsers: [],
   }
-}
+};
