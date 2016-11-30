@@ -6,7 +6,7 @@ var path = require('path')
 var request = require('request')
 var unzip = require('unzip')
 
-var SAUCE_CONNECT_URL = 'http://saucelabs.com/downloads/Sauce-Connect-latest.zip'
+var SAUCE_CONNECT_URL = 'https://saucelabs.com/downloads/Sauce-Connect-latest.zip'
 var jarName = 'Sauce-Connect.jar'
 var jarPath = path.join(__dirname, 'thirdparty', jarName)
 
