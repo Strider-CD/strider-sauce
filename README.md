@@ -1,6 +1,8 @@
 strider-sauce
 =============
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/Strider-CD/strider-sauce.svg)](https://greenkeeper.io/)
+
 Strider-Sauce adds support for easily running [Selenium][selenium] tests in parallel on
 [Sauce Labs'][saucelabs] cloud from within Strider. You simply enter your Sauce Labs
 username and access key and select the browser/OS combinations (including
